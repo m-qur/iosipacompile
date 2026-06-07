@@ -23,18 +23,19 @@ jobs:
           rm -rf ./.??* || true
 
       - name: Checkout repository
-        uses: actions/checkout@main
-
-      - name: Checkout repository submodules
-        run: git submodule update --init --recursive
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Set up Xcode version
         uses: maxim-lobanov/setup-xcode@master
         with:
-          xcode-version: '26.1'
+          xcode-version: '26.1.1'
 
       - name: Install build tools
-        run: brew install make ldid temurin@8
+        run: |
+          brew install make ldid
+          brew install --cask temurin@8
 
       - name: Set up Java 8
         run: |
@@ -101,23 +102,13 @@ jobs:
             gmake -j$(sysctl -n hw.ncpu) dsym package PLATFORM=${{ matrix.platform }}
           fi
 
-      - name: Upload regular ipa
-        uses: actions/upload-artifact@main
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: com.thenullastris.zenithlauncher-${{ matrix.platform_name }}.ipa
-          path: artifacts/com.thenullastris.zenithlauncher-*-${{ matrix.platform_name }}.ipa
-      - name: Upload regular tipa
-        uses: actions/upload-artifact@main
-        with:
-          name: com.thenullastris.zenithlauncher-${{ matrix.platform_name }}-trollstore.tipa
-          path: artifacts/com.thenullastris.zenithlauncher-*-${{ matrix.platform_name }}-trollstore.tipa
-      - name: Upload slimmed ipa
-        uses: actions/upload-artifact@main
-        with:
-          name: com.thenullastris.zenithlauncher.slimmed-${{ matrix.platform_name }}.ipa
-          path: artifacts/com.thenullastris.zenithlauncher.slimmed-*-${{ matrix.platform_name }}.ipa
-      - name: Upload slimmed tipa
-        uses: actions/upload-artifact@main
-        with:
-          name: com.thenullastris.zenithlauncher.slimmed-${{ matrix.platform_name }}-trollstore.tipa
-          path: artifacts/com.thenullastris.zenithlauncher.slimmed-*-${{ matrix.platform_name }}-trollstore.tipa
+          name: amethyst-${{ matrix.platform_name }}-artifacts
+          if-no-files-found: error
+          path: |
+            artifacts/*.ipa
+            artifacts/*.tipa
+            artifacts/java_runtimes.zip
+            artifacts/AngelAuraAmethyst.dSYM/**
