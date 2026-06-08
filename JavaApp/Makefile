@@ -11,6 +11,10 @@ TARGETS := $(TARGETS:$(SOURCEDIR)/%=$(OUTPUTDIR)/%.jar)
 # Add all jars to classpath and allow compiling with private API
 JCFLAGS := -cp "$(subst $() $(),:,$(wildcard $(SOURCEDIR)/*/):$(wildcard libs/*/*.jar))" -XDignore.symbol.file
 
+# javac writes through a shared class staging directory below, so parallel
+# invocations can race and leave zero-byte class files on CI.
+.NOTPARALLEL:
+
 all: $(TARGETS)
 	
 # Sometimes the CI produces empty class file resulting in broken jar, so we check and abort here
