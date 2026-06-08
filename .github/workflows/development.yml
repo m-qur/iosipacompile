@@ -95,7 +95,7 @@ jobs:
           gmake --version
           cmake --version
           xcodebuild -version
-          ldid -v
+          command -v ldid
           wget --version
           if [ "${{ matrix.platform_name }}" == "ios" ]; then
             gmake -j1 java PLATFORM=${{ matrix.platform }}
