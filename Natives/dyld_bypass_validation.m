@@ -228,22 +228,8 @@ void init_bypassDyldLibValidation() {
 
     NSDebugLog(@"[DyldLVBypass] init");
     
-    if (@available(iOS 26.0, *)) {
-        if (DeviceHasJITFlags(JIT_FLAG_FORCE_MIRRORED | JIT_FLAG_HAS_TXM)) {
-            NSDebugLog(@"[DyldLVBypass] Using redirectFunctionMirrored");
-            redirectFunction = redirectFunctionMirrored;
-        } else if (DeviceHasJITFlags(JIT_FLAG_FORCE_MIRRORED)) {
-            // Non-TXM iOS 26+: avoid patching code in dsc, use hardware breakpoint instead
-            NSDebugLog(@"[DyldLVBypass] Using redirectFunctionHWBreakpoint");
-            redirectFunction = redirectFunctionHWBreakpoint;
-        } else {
-            NSDebugLog(@"[DyldLVBypass] Using redirectFunctionDirect");
-            redirectFunction = redirectFunctionDirect;
-        }
-    } else {
-        NSDebugLog(@"[DyldLVBypass] Using redirectFunctionDirect");
-        redirectFunction = redirectFunctionDirect;
-    }
+    NSDebugLog(@"[DyldLVBypass] Using redirectFunctionMirrored");
+    redirectFunction = redirectFunctionMirrored;
     
     // Modifying exec page during execution may cause SIGBUS, so ignore it now
     // Before calling JLI_Launch, this will be set back to SIG_DFL
